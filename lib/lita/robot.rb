@@ -29,7 +29,20 @@ module Lita
     # @param message [Lita::Message] The incoming message.
     # @return [void]
     def receive(message)
+      return if ignore_robot?(message)
       Lita.handlers.each { |handler| handler.dispatch(self, message) }
+    end
+
+    def ignore_robot?(message)
+      robot?(message) && ignore?
+    end
+
+    def robot?(message)
+      message.source.user.id == Lita.config.robot.jid
+    end
+
+    def ignore?
+      Lita.config.robot.ignore
     end
 
     # Starts the robot, booting the web server and delegating to the adapter to
